@@ -1,0 +1,30 @@
+<!doctype html>
+<html>
+  <body>
+    <h3>Dept Chat</h3>
+    <input id="emp" placeholder="employee_id" />
+    <button id="join">Join</button>
+    <pre id="log"></pre>
+    <input id="msg" placeholder="message" />
+    <button id="send">Send</button>
+
+    <script>
+      let ws;
+      join.onclick = () => {
+        const id = document.getElementById('emp').value.trim();
+        ws = new WebSocket(`ws://${location.host}/ws/chat/?employee_id=${encodeURIComponent(id)}`);
+        ws.onmessage = e => {
+          const data = JSON.parse(e.data);
+          log.textContent += `[${data.ts}] ${data.employeeName || 'SYSTEM'}: ${data.message}\n`;
+        };
+        ws.onopen = () => log.textContent += 'CONNECTED\n';
+        ws.onclose = () => log.textContent += 'DISCONNECTED\n';
+      };
+      send.onclick = () => {
+        const txt = document.getElementById('msg').value;
+        ws && ws.send(JSON.stringify({message: txt}));
+        document.getElementById('msg').value = '';
+      };
+    </script>
+  </body>
+</html>
